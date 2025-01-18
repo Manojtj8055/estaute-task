@@ -3,10 +3,14 @@
 ## Overview
 This project implements a solution for fetching employee data and category details, calculating a bell curve distribution based on the data, and displaying the results in a chart.
 
+![image](https://github.com/user-attachments/assets/79318f24-24c5-4668-9231-5e6a25178691)
+
+
 ## Features
 - Fetch employee data and category details from the database.
 - Perform bell curve calculations on the data.
 - Visualize the results using a chart for better insights.
+- A table of employee data with their appraisal details
 
 ## Technologies Used
 - **Backend**: Spring Boot
