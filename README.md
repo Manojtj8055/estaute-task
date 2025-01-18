@@ -11,7 +11,7 @@ This project implements a solution for fetching employee data and category detai
 ## Technologies Used
 - **Backend**: Spring Boot
 - **Database**: PostgreSQL
-- **ORM**: Java Persistence API (JPA)
+- **ORM**: Hibernate
 - **Visualization**: Chart.js
 
 ## Setup Instructions
