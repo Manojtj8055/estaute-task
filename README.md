@@ -30,7 +30,7 @@ Run the `db_setup.sql` script on your local PostgreSQL database to create the ne
 
 ```bash
 psql -U your_database_username -d your_database_name -f src/main/resources/db/migrations/db_setup.sql
-
+```
 # Application Setup Guide
 
 ## 3. Build and Run the Application
