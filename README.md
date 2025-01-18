@@ -1,8 +1,18 @@
-# Employee Appraisal and Bell Curve - Spring Boot Application
+# Employee Bell Curve Calculation and Visualization
 
 ## Overview
+This project implements a solution for fetching employee data and category details, calculating a bell curve distribution based on the data, and displaying the results in a chart.
 
-This application helps to manage employee appraisals and visualize their performance using a bell curve chart. The backend is built using Spring Boot, and the frontend provides an interactive UI to display appraisal data and bell curve statistics.
+## Features
+- Fetch employee data and category details from the database.
+- Perform bell curve calculations on the data.
+- Visualize the results using a chart for better insights.
+
+## Technologies Used
+- **Backend**: Spring Boot
+- **Database**: PostgreSQL
+- **ORM**: Java Persistence API (JPA)
+- **Visualization**: Chart.js
 
 ## Setup Instructions
 
