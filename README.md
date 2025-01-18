@@ -26,10 +26,10 @@ spring:
 
 Navigate to the `src/main/resources/db/migrations/` directory.
 
-Run the `db_setup.sql` script on your local PostgreSQL database to create the necessary tables and insert initial data. You can execute the script using the following command:
+Run the `initial_setup.sql` script on your local PostgreSQL database to create the necessary tables and insert initial data. You can execute the script using the following command:
 
 ```bash
-psql -U your_database_username -d your_database_name -f src/main/resources/db/migrations/db_setup.sql
+psql -U your_database_username -d your_database_name -f src/main/resources/db/migrations/initial_setup.sql
 ```
 # Application Setup Guide
 
