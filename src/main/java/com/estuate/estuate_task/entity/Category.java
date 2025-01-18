@@ -2,19 +2,22 @@ package com.estuate.estuate_task.entity;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
 public class Category {
-    @Id
+  
+	@Id
     private String category;
+	@Column(precision = 38, scale = 2)
     private BigDecimal standardPercentage;
     
     
-    
-    
-    
+    public Category() {
+  		super();
+  	}
     
 	public Category(String category, BigDecimal standardPercentage) {
 		super();

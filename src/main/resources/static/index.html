@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Bell Curve Graph</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
+		}
+
+		canvas {
+			max-width: 50%;
+			height: 250px;
+			/* Set the desired height */
+			width: 100%;
+			/* Ensure the chart takes up 100% of the container's width */
+		}
+
+		table {
+			margin-top: 30px;
+			width: 100%;
+		}
+
+		th,
+		td {
+			padding: 10px;
+			text-align: center;
+			border: 1px solid black;
+		}
+
+		.table-container {
+			margin-top: 30px;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h1>Employee Bell Curve Graph</h1>
+	<canvas id="bellCurveChart"></canvas>
+
+	<div class="table-container">
+		<table class="table table-bordered" id="employeeTable">
+			<thead>
+				<tr>
+					<th>Employee ID</th>
+					<th>Employee Name</th>
+					<th>Category</th>
+					<th>Actual Percentage</th>
+					<th>Deviation</th>
+					<th>Suggestion</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Employee data will be populated here -->
+			</tbody>
+		</table>
+	</div>
+	</div>
+
+
+	<script>
+		// Fetch bell curve data from the Spring Boot backend
+		fetch('appraisal/bellcurve')
+			.then(response => response.json())
+			.then(data => {
+				// Process the data to format it for the chart
+				const categories = Object.keys(data.categoryCounts);
+				const actualPercentages = categories.map(category => data.actualPercentages[category]);
+				const deviations = categories.map(category => data.deviations[category]);
+				const suggestions = categories.map(category => data.suggestions[category]);
+
+				// Set up the chart data
+				const chartData = {
+					labels: categories,  // Category names (A, B, C, D, E)
+					datasets: [
+						{
+							label: 'Actual Percentage',
+							data: actualPercentages,  // Data for actual percentages
+							borderColor: 'rgba(75, 192, 192, 1)',  // Line color
+							fill: false,  // No fill under the line
+							tension: 0.4  // Smooth curve
+						},
+						{
+							label: 'Deviation',
+							data: deviations,  // Data for deviations
+							borderColor: 'rgba(255, 99, 132, 1)',  // Line color for deviation
+							fill: false,  // No fill under the line
+							tension: 0.4  // Smooth curve
+						}
+					]
+				};
+
+				// Set up the chart options
+				const chartOptions = {
+					scales: {
+						y: {
+							beginAtZero: false,  // Don't start y-axis at zero for more accurate data representation
+							title: {
+								display: true,
+								text: 'Percentage (%)'
+							}
+						},
+						x: {
+							title: {
+								display: true,
+								text: 'Categories'
+							}
+						}
+					},
+					plugins: {
+						tooltip: {
+							callbacks: {
+								label: function (tooltipItem) {
+									const value = tooltipItem.raw.toFixed(2);
+									return `${tooltipItem.dataset.label}: ${value}%`;
+								}
+							}
+						}
+					}
+				};
+
+				// Create the line chart
+				const ctx = document.getElementById('bellCurveChart').getContext('2d');
+				new Chart(ctx, {
+					type: 'line',  // Line chart type
+					data: chartData,
+					options: chartOptions
+				});
+			})
+			.catch(error => {
+				console.error('Error fetching bell curve data:', error);
+			});
+
+
+
+
+		async function fetchEmployeeAppraisalDetails() {
+			const response = await fetch('employee/appraisal-details');
+			const data = await response.json();
+
+			const tableBody = document.querySelector('#employeeTable tbody');
+			tableBody.innerHTML = ''; // Clear existing rows
+
+			data.forEach(employee => {
+				const row = document.createElement('tr');
+				row.innerHTML = `
+			                   <td>${employee.employeeId}</td>
+			                   <td>${employee.employeeName}</td>
+			                   <td>${employee.category}</td>
+			                   <td>${employee.actualPercentage}</td>
+			                   <td>${employee.deviation}</td>
+			                   <td>${employee.suggestion}</td>
+			               `;
+				tableBody.appendChild(row);
+			});
+		}
+		fetchEmployeeAppraisalDetails();
+	</script>
+
+</body>
+
+</html>

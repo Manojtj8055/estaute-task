@@ -18,6 +18,18 @@ public class Appraisal {
     private String suggestion;
     
     
+    
+	public Appraisal() {
+		super();
+	}
+	public Appraisal(Long id, int employeeId, BigDecimal actualPercentage, BigDecimal deviation, String suggestion) {
+		super();
+		this.id = id;
+		this.employeeId = employeeId;
+		this.actualPercentage = actualPercentage;
+		this.deviation = deviation;
+		this.suggestion = suggestion;
+	}
 	@Override
 	public String toString() {
 		return "Appraisal [id=" + id + ", employeeId=" + employeeId + ", actualPercentage=" + actualPercentage

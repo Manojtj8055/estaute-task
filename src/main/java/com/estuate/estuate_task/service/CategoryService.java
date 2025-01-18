@@ -15,16 +15,7 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    /**
-     * Get all categories with standard percentages
-     */
-//    public Map<String, BigDecimal> getCategoryStandards() {
-//        return categoryRepository.findAllCategoryStandards();
-//    }
-
-    /**
-     * Get the standard percentage for a specific category
-     */
+  
     public BigDecimal getCategoryStandard(String category) {
         return categoryRepository.findById(category)
                 .map(Category::getStandardPercentage)

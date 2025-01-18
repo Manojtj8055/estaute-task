@@ -16,7 +16,11 @@ public class Employee {
     private int rating;
     private String category;
     
+    public Employee() {
+    	super();
+    }
     
+   
     
     
 	public Employee(Integer id, String name, int rating, String category) {

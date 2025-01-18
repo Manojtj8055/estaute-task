@@ -1,72 +1,109 @@
 package com.estuate.estuate_task.service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.estuate.estuate_task.entity.Appraisal;
+import com.estuate.estuate_task.entity.Category;
 import com.estuate.estuate_task.entity.Employee;
-import com.estuate.estuate_task.repository.AppraisalRepository;
+import com.estuate.estuate_task.repository.CategoryRepository;
+import com.estuate.estuate_task.repository.EmployeeRepository;
 
 @Service
 public class AppraisalService {
 
     @Autowired
-    private EmployeeService employeeService;
+    private EmployeeRepository employeeRepository;
 
     @Autowired
-    private CategoryService categoryService;
+    private CategoryRepository categoryRepository;
 
-    @Autowired
-    private AppraisalRepository appraisalRepository;
+    private long getTotalEmployees(List<Employee> employees) {
+        return employees.size();
+    }
 
-    /**
-     * Calculate the actual percentage for the given employee based on their rating
-     */
-    public BigDecimal calculateActualPercentage(Employee employee) {
-        // The logic for actual percentage can be customized based on rating logic.
-        switch (employee.getRating()) {
-            case 1: return BigDecimal.valueOf(90);
-            case 2: return BigDecimal.valueOf(75);
-            case 3: return BigDecimal.valueOf(60);
-            case 4: return BigDecimal.valueOf(45);
-            case 5: return BigDecimal.valueOf(30);
-            default: return BigDecimal.ZERO;
+  
+    private Map<String, Long> countEmployeesByCategory(List<Employee> employees) {
+        return employees.stream()
+                .collect(Collectors.groupingBy(Employee::getCategory, Collectors.counting()));
+    }
+
+  
+    private Map<String, BigDecimal> calculateActualPercentage(Map<String, Long> categoryCounts, long totalEmployees) {
+        Map<String, BigDecimal> actualPercentages = new HashMap<>();
+        for (Map.Entry<String, Long> entry : categoryCounts.entrySet()) {
+            BigDecimal percentage = BigDecimal.valueOf(entry.getValue())
+                    .divide(BigDecimal.valueOf(totalEmployees), 4, BigDecimal.ROUND_HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+            actualPercentages.put(entry.getKey(), percentage);
         }
+        return actualPercentages;
     }
 
-    /**
-     * Calculate the deviation between actual and standard percentage
-     */
-    public BigDecimal calculateDeviation(Employee employee, BigDecimal actualPercentage) {
-        BigDecimal standardPercentage = categoryService.getCategoryStandard(employee.getCategory());
-        return actualPercentage.subtract(standardPercentage);
-    }
+    private Map<String, BigDecimal> calculateDeviations(Map<String, BigDecimal> actualPercentages) {
+        Map<String, BigDecimal> deviations = new HashMap<>();
+        
+        // Fetch the standard percentages from the category table
+        List<Category> categories = categoryRepository.findAll();
+        Map<String, BigDecimal> standardPercentages = categories.stream()
+                .collect(Collectors.toMap(Category::getCategory, Category::getStandardPercentage));
 
-    /**
-     * Suggest revision based on deviation
-     */
-    public String suggestRevision(BigDecimal deviation) {
-        BigDecimal threshold = BigDecimal.valueOf(5);
-        if (deviation.compareTo(threshold) > 0) {
-            return "Suggest Revision - Over Performance";
-        } else if (deviation.compareTo(threshold.negate()) < 0) {
-            return "Suggest Revision - Under Performance";
-        } else {
-            return "No Revision Needed";
+        // Calculate the deviation for each category
+        for (String category : actualPercentages.keySet()) {
+            BigDecimal actual = actualPercentages.get(category);
+            BigDecimal standard = standardPercentages.get(category);
+            BigDecimal deviation = actual.subtract(standard);
+            deviations.put(category, deviation);
         }
+
+        return deviations;
     }
 
-    /**
-     * Save appraisal data after calculating deviation and suggestion
-     */
-    public void saveAppraisal(Employee employee, BigDecimal actualPercentage, BigDecimal deviation, String suggestion) {
-        Appraisal appraisal = new Appraisal();
-        appraisal.setEmployeeId(employee.getId());
-        appraisal.setActualPercentage(actualPercentage);
-        appraisal.setDeviation(deviation);
-        appraisal.setSuggestion(suggestion);
-        appraisalRepository.save(appraisal);
+   
+    private Map<String, String> suggestRevisions(Map<String, BigDecimal> deviations) {
+        Map<String, String> suggestions = new HashMap<>();
+        for (Map.Entry<String, BigDecimal> entry : deviations.entrySet()) {
+            if (entry.getValue().abs().compareTo(BigDecimal.valueOf(10)) > 0) {
+                suggestions.put(entry.getKey(), "Consider revision");
+            } else {
+                suggestions.put(entry.getKey(), "No revision needed");
+            }
+        }
+        return suggestions;
+    }
+
+    
+    public Map<String, Object> generateBellCurveData() {
+      
+        List<Employee> employees = employeeRepository.findAll();
+        
+     
+        long totalEmployees = getTotalEmployees(employees);
+        
+       
+        Map<String, Long> categoryCounts = countEmployeesByCategory(employees);
+        
+      
+        Map<String, BigDecimal> actualPercentages = calculateActualPercentage(categoryCounts, totalEmployees);
+        
+       
+        Map<String, BigDecimal> deviations = calculateDeviations(actualPercentages);
+        
+       
+        Map<String, String> suggestions = suggestRevisions(deviations);
+
+        
+        Map<String, Object> bellCurveData = new HashMap<>();
+        bellCurveData.put("categoryCounts", categoryCounts);
+        bellCurveData.put("actualPercentages", actualPercentages);
+        bellCurveData.put("deviations", deviations);
+        bellCurveData.put("suggestions", suggestions);
+
+        return bellCurveData;
     }
 }
