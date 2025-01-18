@@ -70,7 +70,7 @@ The application should now be running locally.
 1. Open a web browser and navigate to the following URL to view the application’s user interface:
 
     ```text
-    http://localhost:8080/index.html
+    http://localhost:8080/api/index.html
     ```
 
 2. You will see the bell curve chart along with the employee appraisal details displayed on the UI.
