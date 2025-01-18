@@ -1,0 +1,29 @@
+# Spring Boot Configuration File (application.yml)
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# DataSource Configuration (for MySQL)
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/task
+    username: admin
+    password: manu@123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update  # Options: none, update, create, create-drop
+    show-sql: true  # Set to false for production
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true # To make JSON pretty printed if needed
+
